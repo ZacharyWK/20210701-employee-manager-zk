@@ -1,0 +1,16 @@
+{
+  "name": "20210701-employee-manager-zk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^8.1.1",
+    "mysql2": "^2.2.5"
+  }
+}
