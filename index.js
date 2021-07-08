@@ -28,7 +28,7 @@ async function view() {
     type: "list",
     name: "option",
     message: "What would you like to View?",
-    choices: ["Add Something", "View Something", "Delete Something", "EXIT"],
+    choices: ["View all Employees", "View an Employee", "View all Role", "EXIT"],
   });
 
   if (option === "Add Something") {
@@ -45,35 +45,27 @@ async function view() {
 
 async function addEmp() 
 {
-  // const departments = await connection.query("SELECT dep_name FROM department")
+const role = await connection.query("SELECT rol_id FROM employee_role")
+const mngr = await connection.query("SELECT emp_first_name, emp_last_name, emp_id FROM employee WHERE rol_id = 1")
 
-  const role = await connection.query("SELECT rol_id FROM employee_role")
-  const mngr = await connection.query("SELECT emp_first_name, emp_last_name, emp_id FROM employee WHERE rol_id = 1")
-  // mngr.push("None")
 console.log ("mngr", mngr)
-  const { option } = await inquirer.prompt
+const { option } = await inquirer.prompt
 ([
 {
-  name: "add_emp_ln",
-  message: "Enter Employee;s Last name.",
-  default: "Last Name"
+name: "add_emp_ln",
+message: "Enter Employee;s Last name.",
+default: "Last Name"
 },
 {
-  name: "add_emp_fn",
-  message: "Enter Employee;s First name.",
-  default: "First Name"
+name: "add_emp_fn",
+message: "Enter Employee;s First name.",
+default: "First Name"
 },
-// {
-//   type: "list",
-//   name: "what_dep",
-//   message: "What department will they be in?",
-//   choices: departments,
-// },
 {
-  type: "list",
-  name: "what_rol",
-  message: "What is the employees role?",
-  choices: role,
+type: "list",
+name: "what_rol",
+message: "What is the employees role?",
+choices: role,
 },
 {
   type: "list",
