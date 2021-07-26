@@ -157,7 +157,7 @@ async function addEmp() {
     rol_id: data.rol_id,
     emp_manager_id: data.emp_manager_id,
   })};
-  await init();
+init();
 }
 
 async function addDep() {
@@ -171,7 +171,7 @@ async function addDep() {
   const query = await connection.query("INSERT INTO department SET ?", {
     dep_name: data.add_dep_name,
   });
-  await init();
+init();
 }
 
 async function addRol() {
@@ -204,7 +204,7 @@ async function addRol() {
     rol_salary: data.add_rol_sal,
     dep_id: data.what_dep,
   });
-  await init();
+init();
 }
 
 //VIEW
@@ -258,8 +258,7 @@ async function changeRol() {
     ]
   );
   const query = await connection.query("UPDATE employee SET ? WHERE ?",[{rol_id: option.new_role_id},{emp_id: option.id}]);
-  await viewRol(); 
-  // await init();
+  await init();
 }
 async function changeDep() {
   const role = await connection.query(
@@ -298,8 +297,7 @@ async function changeDep() {
     ]
   );
   const query = await connection.query("UPDATE employee_role SET ? WHERE ?",[{dep_id: option.new_dep_id, rol_salary: option.new_rol_salary},{rol_id: option.id},]);
-  await viewEmp();
-  // await init();
+  await init();
 }
 
 
@@ -334,15 +332,13 @@ async function changeMan() {
     ]
    );
    const query = await connection.query("UPDATE employee SET ? WHERE ?",[{dep_id: option.new_dep_id, rol_salary: option.new_rol_salary},{rol_id: option.id},]);
-   await viewEmp();
-  //  await init();
+   await init();
 }
 
 //DELETE
 async function deleteEmp() {
-  await viewEmp();
-
- const empName = await connection.query(
+  
+  const empName = await connection.query(
     "SELECT emp_first_name, emp_last_name, emp_id FROM employee"
   );
   const  option  = await inquirer.prompt(
@@ -359,13 +355,11 @@ async function deleteEmp() {
     ]
   );
   const query = await connection.query("DELETE FROM employee WHERE ?",{emp_id: option.id});
-  await viewEmp();
-  // await init();
+  await init();
 }
 
 async function deleteRol() {
-  await viewRol();
-
+ 
   const role = await connection.query(
     "SELECT rol_id, rol_title FROM employee_role"
   );
@@ -384,13 +378,11 @@ async function deleteRol() {
      ]
    );
    const query = await connection.query("DELETE FROM employee_role WHERE ?",{rol_id: option.id});
-  await viewRol();
-  // await init();
+   await init();
 }
  
 async function deleteDep() {
-  await viewDep();
-
+ 
   const dep = await connection.query(
     "SELECT dep_id, dep_name FROM department"
   );
@@ -408,6 +400,5 @@ async function deleteDep() {
      ]
    );
    const query = await connection.query("DELETE FROM department WHERE ?",{dep_id: option.id});
-  await viewDep();
-  // await init();
+   await init();
 }
