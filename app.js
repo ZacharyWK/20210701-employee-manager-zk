@@ -72,14 +72,14 @@ async function change() {
     message: "What would you like to Change?",
     choices: [
       "Change an Employees Manager",
-      "Change an Employees Department",
+      "Change a Role's Department",
       "Change an Employees Role",
       "Go Back",
     ],
   });
   if (choiceChange === "Change an Employees Manager") {
     changeMan();
-  } else if (choiceChange === "Change an Employees Department") {
+  } else if (choiceChange === "Change a Role's Department") {
     changeDep();
   } else if (choiceChange === "Change an Employees Role") {
     changeRol();
@@ -93,14 +93,14 @@ async function del() {
     name: "choiceDelete",
     message: "What would you like to Delete?",
     choices: [
-      "Delete a Manager",
+      "Delete an Employee",
       "Delete a Department",
       "Delete a Role",
       "Go Back",
     ],
   });
-  if (choiceDelete === "Delete a Manager") {
-    deleteMan();
+  if (choiceDelete === "Delete an Employee") {
+    deleteEmp();
   } else if (choiceDelete === "Delete a Department") {
     deleteDep();
   } else if (choiceDelete === "Delete a Role") {
@@ -119,20 +119,20 @@ async function addEmp() {
     "SELECT emp_first_name, emp_last_name, emp_id FROM employee WHERE rol_id = 1"
   );
   console.log(mngr);
-  const { option } = await inquirer.prompt([
+  const  data  = await inquirer.prompt([
     {
-      name: "add_emp_ln",
+      name: "emp_last_name",
       message: "Enter Employee;s Last name.",
       default: "Last Name",
     },
     {
-      name: "add_emp_fn",
+      name: "emp_first_name",
       message: "Enter Employee;s First name.",
       default: "First Name",
     },
     {
       type: "list",
-      name: "what_rol",
+      name: "rol_id",
       message: "What is the employees role?",
       choices: role.map((item) => ({
         value: item.rol_id,
@@ -141,7 +141,7 @@ async function addEmp() {
     },
     {
       type: "list",
-      name: "what_mngr",
+      name: "emp_manager_id",
       message: "Who is the Employees Manager?",
       choices: mngr.map((item) => ({
         value: item.emp_id,
@@ -149,17 +149,19 @@ async function addEmp() {
       })),
     },
   ]);
-  const query = await connection.query("INSERT INTO employee SET ?", {
-    emp_first_name: option.add_emp_fn.value,
-    emp_last_name: option.add_emp_ln.value,
-    rol_id: option.what_rol.value,
-    emp_manager_id: option.what_mngr.value,
-  });
+  if (data !== ""){
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data)
+    connection.query("INSERT INTO employee SET ?", {
+    emp_first_name: data.emp_first_name,
+    emp_last_name: data.emp_last_name,
+    rol_id: data.rol_id,
+    emp_manager_id: data.emp_manager_id,
+  })};
   await init();
 }
 
 async function addDep() {
-  const { option } = await inquirer.prompt([
+  const  data  = await inquirer.prompt([
     {
       name: "add_dep_name",
       message: "Enter Departments name.",
@@ -167,7 +169,7 @@ async function addDep() {
     },
   ]);
   const query = await connection.query("INSERT INTO department SET ?", {
-    dep_name: add_dep_name,
+    dep_name: data.add_dep_name,
   });
   await init();
 }
@@ -176,26 +178,31 @@ async function addRol() {
   const department = await connection.query(
     "SELECT dep_id, dep_name FROM department"
   );
-  const { option } = await inquirer.prompt([
+  const  data  = await inquirer.prompt([
     {
-      name: "add_dep_name",
-      message: "Enter Departments name.",
-      default: "Department",
+      name: "add_rol_name",
+      message: "Enter Role name.",
+      default: "Role Name",
+    },
+    {
+      name: "add_rol_sal",
+      message: "Enter Role Salary.",
+      default: "50500",
     },
     {
       type: "list",
       name: "what_dep",
-      message: "What is the employees role?",
+      message: "What department is the role for?",
       choices: department.map((item) => ({
         value: item.dep_id,
         name: item.dep_name,
       })),
     },
   ]);
-  const query = await connection.query("INSERT INTO department SET ?", {
-    rol_title: option.add_dep_name,
-    rol_salary: option.add_dep_name,
-    dep_id: option.what_dep,
+  const query = await connection.query("INSERT INTO employee_role SET ?", {
+    rol_title: data.add_rol_name,
+    rol_salary: data.add_rol_sal,
+    dep_id: data.what_dep,
   });
   await init();
 }
@@ -220,34 +227,7 @@ async function viewRol() {
   });
 }
 
-//CHANGE <<<<<<WORKING HERE
-// function changeRol(){
-// const role = connection.query("SELECT rol_id, rol_title FROM employee_role")
-// connection.query("SELECT * FROM employee_role", (err, data) =>{
-// if (err) throw err;
-// inquirer.prompt([
-// {
-// type: "list",
-// name: "id",
-// message: "Which employees role is being changed?",
-// choices: empName.map((item) => ({ value: item.emp_id, name: item.emp_last_name + ", " + item.emp_first_name}))
-// },
-// {
-// type: "list",
-// name: "role_id",
-// message: "What role would you like to give the employee?",
-// choices: role.map((item) => ({value:item.rol_id, name:item.rol_title}))
-// }
-// ])
-// .then (function(data) {
-// connection.query("UPDATE employee WHERE id = ? SET role_id = ?", {
-// role_id: data.id
-// });
-// viewEmp();
-// });
-// });
-// }
-
+//CHANGE
 async function changeRol() {
   const empName = await connection.query(
     "SELECT emp_first_name, emp_last_name, emp_id FROM employee"
@@ -255,12 +235,7 @@ async function changeRol() {
   const role = await connection.query(
     "SELECT rol_id, rol_title FROM employee_role"
   );
-
-  const department = await connection.query(
-    "SELECT dep_id, dep_name FROM department"
-  );
-  const { option } = await inquirer.prompt(
-    // UPDATE rol_id SET new_rol_id FROM employee WHERE emp_id = id
+  const  option  = await inquirer.prompt(
     [
       {
         type: "list",
@@ -282,57 +257,157 @@ async function changeRol() {
       },
     ]
   );
-  const query = await connection.query("UPDATE employee SET ? WHERE ?", {
-    rol_id: option.new_role_id,
-    emp_id: option.id,
-  });
+  const query = await connection.query("UPDATE employee SET ? WHERE ?",[{rol_id: option.new_role_id},{emp_id: option.id}]);
+  await viewRol(); 
+  // await init();
+}
+async function changeDep() {
+  const role = await connection.query(
+    "SELECT rol_id, rol_title FROM employee_role"
+  );
+
+  const dep = await connection.query(
+    "SELECT dep_id, dep_name FROM department"
+  );
+  const  option  = await inquirer.prompt(
+    [
+      {
+        type: "list",
+        name: "id",
+        message: "Which Role is being changed?",
+        choices: role.map((item) => ({
+          value: item.rol_id,
+          name: item.rol_title,
+        })),
+      },
+      {
+        type: "list",
+        name: "new_dep_id",
+        message: "What Department should the role be moved too?",
+        choices: dep.map((item) => ({
+          value: item.dep_id,
+          name: item.dep_name,
+        })),
+      },
+      {
+        type: "input",
+        name: "new_rol_salary",
+        message: "Whats the salary for the rol",
+        default: "50500"
+      },
+    ]
+  );
+  const query = await connection.query("UPDATE employee_role SET ? WHERE ?",[{dep_id: option.new_dep_id, rol_salary: option.new_rol_salary},{rol_id: option.id},]);
+  await viewEmp();
+  // await init();
 }
 
-function changeDep() {
-  connection.query("SELECT * FROM employee_role", (err, data) => {
-    if (err) throw err;
-    inquirer
-      .prompt([
-        {
-          message:
-            "Enter ID of the employee whose Department you'd like to change.",
-          name: "id",
-        },
-        {
-          message: "What is the new Department Id you'd like to give them?",
-          name: "_id",
-        },
-      ])
-      .then(function (data) {
-        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", {
-          role_id: data.id,
-        });
-        viewEmp();
-      });
-  });
-}
-function changeMan() {
-  connection.query("SELECT * FROM employee", (err, data) => {
-    if (err) throw err;
-    inquirer
-      .prompt([
-        {
-          message:
-            "Enter ID of the employee whose Manager you'd like to change.",
-          name: "id",
-        },
-        {
-          message: "What is their new Managers Id?",
-          name: "emp_manager_id",
-        },
-      ])
-      .then(function (data) {
-        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", {
-          role_id: data.id,
-        });
-        viewEmp();
-      });
-  });
+
+async function changeMan() {
+  const empName = await connection.query(
+    "SELECT emp_first_name, emp_last_name, emp_id FROM employee"
+  );
+  const manName = await connection.query(
+    "SELECT emp_first_name, emp_last_name, emp_id FROM employee WHERE rol_id = 1"
+  );
+
+  const  option  = await inquirer.prompt(
+    [
+      {
+        type: "list",
+        name: "id",
+        message: "Which employee is being changed?",
+        choices: empName.map((item) => ({
+          value: item.emp_id,
+          name: item.emp_last_name + ", " + item.emp_first_name,
+        })),
+      },
+      {
+        type: "list",
+        name: "man_id",
+        message: "Who is the employees new Manager?",
+        choices: manName.map((item) => ({
+          value: item.emp_id,
+          name: item.emp_last_name + ", " + item.emp_first_name,
+        })),
+      },
+    ]
+   );
+   const query = await connection.query("UPDATE employee SET ? WHERE ?",[{dep_id: option.new_dep_id, rol_salary: option.new_rol_salary},{rol_id: option.id},]);
+   await viewEmp();
+  //  await init();
 }
 
 //DELETE
+async function deleteEmp() {
+  await viewEmp();
+
+ const empName = await connection.query(
+    "SELECT emp_first_name, emp_last_name, emp_id FROM employee"
+  );
+  const  option  = await inquirer.prompt(
+    [
+      {
+        type: "list",
+        name: "id",
+        message: "Which employee is being Deleted?",
+        choices: empName.map((item) => ({
+          value: item.emp_id,
+          name: item.emp_last_name + ", " + item.emp_first_name,
+        })),
+      },
+    ]
+  );
+  const query = await connection.query("DELETE FROM employee WHERE ?",{emp_id: option.id});
+  await viewEmp();
+  // await init();
+}
+
+async function deleteRol() {
+  await viewRol();
+
+  const role = await connection.query(
+    "SELECT rol_id, rol_title FROM employee_role"
+  );
+
+   const  option  = await inquirer.prompt(
+     [
+       {
+         type: "list",
+         name: "id",
+         message: "Which role is being Deleted?",
+         choices: role.map((item) => ({
+          value: item.rol_id,
+          name: item.rol_title,
+         })),
+       },
+     ]
+   );
+   const query = await connection.query("DELETE FROM employee_role WHERE ?",{rol_id: option.id});
+  await viewRol();
+  // await init();
+}
+ 
+async function deleteDep() {
+  await viewDep();
+
+  const dep = await connection.query(
+    "SELECT dep_id, dep_name FROM department"
+  );
+   const  option  = await inquirer.prompt(
+     [
+       {
+         type: "list",
+         name: "id",
+         message: "Which department is being Deleted?",
+         choices: dep.map((item) => ({
+          value: item.dep_id,
+          name: item.dep_name,
+         })),
+       },
+     ]
+   );
+   const query = await connection.query("DELETE FROM department WHERE ?",{dep_id: option.id});
+  await viewDep();
+  // await init();
+}
